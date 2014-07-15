@@ -17,7 +17,8 @@ class StorageProviderClient(object):
         :param object_key: specific object key for the object in the container
         '''
         res = requests.delete(self.base_url + '/' + container_key + '/' + object_key)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
 
     def get_object(self, container_key, object_key):
         '''
@@ -28,7 +29,8 @@ class StorageProviderClient(object):
         :return content of the object
         '''
         res = requests.get(self.base_url + '/' + container_key + '/' + object_key)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
         return res.content
 
     def update_object(self, container_key, object_key, object_data):
@@ -40,7 +42,8 @@ class StorageProviderClient(object):
         :param object_data: data of the object
         '''
         res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
 
     def list_object_keys_for_container(self, container_key):
         '''
@@ -50,7 +53,8 @@ class StorageProviderClient(object):
         :return list of object keys found in the container
         '''
         res = requests.get(self.base_url + '/' + container_key)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
         return res.content
 
     def create_container(self, container_key):
@@ -60,7 +64,8 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         '''
         res = requests.put(self.base_url + '/' + container_key)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
 
     def create_container_and_key(self):
         '''
@@ -69,7 +74,8 @@ class StorageProviderClient(object):
         :return the key generated for the container
         '''
         res = requests.post(self.base_url)
-        assert 201 == res.status_code
+        if res.status_code != 201:
+            raise InvalidStateException(res.status_code)
         container_key = res.json()['container_key']
         if isinstance(container_key, text_type):
             container_key = str(container_key)
@@ -82,4 +88,14 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         '''
         res = requests.delete(self.base_url + '/' + container_key)
-        assert 200 == res.status_code
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code)
+
+
+class InvalidStateException(Exception):
+    def __init__(self, status_code, message='response has invalid state'):
+        self.status_code = status_code
+        self.message = message
+
+    def __str__(self):
+        return self.message + ', http status code: ' + repr(self.status_code)

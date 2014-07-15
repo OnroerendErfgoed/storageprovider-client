@@ -2,7 +2,7 @@
 
 import os
 import unittest
-from storageprovider.client import StorageProviderClient
+from storageprovider.client import StorageProviderClient, InvalidStateException
 
 try:
     from unittest.mock import Mock, patch
@@ -33,12 +33,15 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_delete_object_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.delete.return_value.status_code = 400
         try:
             self.storageproviderclient.delete_object(test_container_key, test_object_key)
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_get_object(self, mock_requests):
@@ -49,12 +52,15 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_get_object_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.get.return_value.status_code = 400
         try:
             self.storageproviderclient.get_object(test_container_key, test_object_key)
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_update_object(self, mock_requests):
@@ -70,13 +76,16 @@ class StorageProviderTest(unittest.TestCase):
     def test_update_object_KO(self, mock_requests):
         kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
         error_thrown = False
+        error = None
         mock_requests.put.return_value.status_code = 400
         try:
             with open(kasteel, 'rb') as f:
                 self.storageproviderclient.update_object(test_container_key, test_object_key, f.read())
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container(self, mock_requests):
@@ -87,12 +96,15 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.get.return_value.status_code = 400
         try:
             self.storageproviderclient.list_object_keys_for_container(test_container_key)
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_create_container(self, mock_requests):
@@ -103,12 +115,15 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_create_container_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.put.return_value.status_code = 400
         try:
             self.storageproviderclient.create_container(test_container_key)
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_create_container_and_key(self, mock_requests):
@@ -129,12 +144,15 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_create_container_and_key_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.post.return_value.status_code = 400
         try:
             self.storageproviderclient.create_container_and_key()
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
     def test_delete_container(self, mock_requests):
@@ -145,9 +163,13 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_delete_container_KO(self, mock_requests):
         error_thrown = False
+        error = None
         mock_requests.delete.return_value.status_code = 400
         try:
             self.storageproviderclient.delete_container(test_container_key)
-        except AssertionError:
+        except InvalidStateException as ise:
             error_thrown = True
+            error = ise
         self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
+        self.assertEqual('response has invalid state, http status code: 400', str(error))
