@@ -15,6 +15,7 @@ class StorageProviderClient(object):
 
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.delete(self.base_url + '/' + container_key + '/' + object_key)
         if res.status_code != 200:
@@ -27,6 +28,7 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :return content of the object
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.get(self.base_url + '/' + container_key + '/' + object_key)
         if res.status_code != 200:
@@ -40,6 +42,7 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :param object_data: data of the object
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data)
         if res.status_code != 200:
@@ -51,6 +54,7 @@ class StorageProviderClient(object):
 
         :param container_key: key of the container in the data store
         :return list of object keys found in the container
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.get(self.base_url + '/' + container_key)
         if res.status_code != 200:
@@ -62,6 +66,7 @@ class StorageProviderClient(object):
         create a new container with specific key in the data store
 
         :param container_key: key of the container in the data store
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.put(self.base_url + '/' + container_key)
         if res.status_code != 200:
@@ -72,6 +77,7 @@ class StorageProviderClient(object):
         create a new container in the data store and generate key
 
         :return the key generated for the container
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.post(self.base_url)
         if res.status_code != 201:
@@ -86,6 +92,7 @@ class StorageProviderClient(object):
         delete a container in the data store
 
         :param container_key: key of the container in the data store
+        :raises InvalidStateException: if the response is in an invalid state
         '''
         res = requests.delete(self.base_url + '/' + container_key)
         if res.status_code != 200:
