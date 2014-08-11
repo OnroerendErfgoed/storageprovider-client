@@ -70,7 +70,8 @@ class StorageProviderTest(unittest.TestCase):
         with open(kasteel, 'rb') as f:
             bin_file = f.read()
         self.storageproviderclient.update_object(test_container_key, test_object_key, bin_file)
-        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key, bin_file)
+        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key, bin_file,
+                                             headers={'content-type': 'application/octet-stream'})
 
     @patch('storageprovider.client.requests')
     def test_update_object_KO(self, mock_requests):

@@ -44,7 +44,8 @@ class StorageProviderClient(object):
         :param object_data: data of the object
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data)
+        headers = {'content-type': 'application/octet-stream'}
+        res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
 
