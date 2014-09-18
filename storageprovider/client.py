@@ -2,7 +2,6 @@
 
 import requests
 from six import text_type
-import string
 
 
 class StorageProviderClient(object):
