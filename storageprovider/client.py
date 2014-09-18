@@ -2,12 +2,21 @@
 
 import requests
 from six import text_type
+import string
 
 
 class StorageProviderClient(object):
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, container_prefix='', prefix_separator=':'):
         self.base_url = base_url
+        self.has_prefix = container_prefix != ''
+        self.container_prefix = container_prefix
+        self.prefix_separator = prefix_separator
+
+    def prefix(self, container_key):
+        return self.prefix_separator.join([self.container_prefix, container_key]) \
+            if self.has_prefix \
+            else container_key
 
     def delete_object(self, container_key, object_key):
         '''
@@ -17,7 +26,7 @@ class StorageProviderClient(object):
         :param object_key: specific object key for the object in the container
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.delete(self.base_url + '/' + container_key + '/' + object_key)
+        res = requests.delete(self.base_url + '/' + self.prefix(container_key) + '/' + object_key)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
 
@@ -30,7 +39,7 @@ class StorageProviderClient(object):
         :return content of the object
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.get(self.base_url + '/' + container_key + '/' + object_key)
+        res = requests.get(self.base_url + '/' + self.prefix(container_key) + '/' + object_key)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
         return res.content
@@ -45,7 +54,7 @@ class StorageProviderClient(object):
         :raises InvalidStateException: if the response is in an invalid state
         '''
         headers = {'content-type': 'application/octet-stream'}
-        res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data, headers=headers)
+        res = requests.put(self.base_url + '/' + self.prefix(container_key) + '/' + object_key, object_data, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
 
@@ -57,7 +66,7 @@ class StorageProviderClient(object):
         :return list of object keys found in the container
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.get(self.base_url + '/' + container_key)
+        res = requests.get(self.base_url + '/' + self.prefix(container_key))
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
         return res.content
@@ -69,7 +78,7 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.put(self.base_url + '/' + container_key)
+        res = requests.put(self.base_url + '/' + self.prefix(container_key))
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
 
@@ -95,7 +104,7 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        res = requests.delete(self.base_url + '/' + container_key)
+        res = requests.delete(self.base_url + '/' + self.prefix(container_key))
         if res.status_code != 200:
             raise InvalidStateException(res.status_code)
 
