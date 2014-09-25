@@ -222,6 +222,7 @@ class StorageProviderTest(unittest.TestCase):
         error_thrown = False
         error = None
         mock_requests.delete.return_value.status_code = 400
+        mock_requests.delete.return_value.text = 'test error'
         try:
             self.storageproviderclient.delete_container(test_container_key)
         except InvalidStateException as ise:
@@ -229,4 +230,4 @@ class StorageProviderTest(unittest.TestCase):
             error = ise
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
-        self.assertEqual('response has invalid state, http status code: 400', str(error))
+        self.assertEqual('test error, http status code: 400', str(error))

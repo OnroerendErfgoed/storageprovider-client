@@ -23,7 +23,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.delete(self.base_url + '/' + container_key + '/' + object_key, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
 
     def get_object(self, container_key, object_key, system_token=None):
         '''
@@ -40,7 +40,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.get(self.base_url + '/' + container_key + '/' + object_key, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
         return res.content
 
     def update_object(self, container_key, object_key, object_data, system_token=None):
@@ -58,7 +58,7 @@ class StorageProviderClient(object):
             headers['OpenAmSSOID'] = system_token
         res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
 
     def list_object_keys_for_container(self, container_key, system_token=None):
         '''
@@ -74,7 +74,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.get(self.base_url + '/' + container_key, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
         return res.content
 
     def create_container(self, container_key, system_token=None):
@@ -90,7 +90,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.put(self.base_url + '/' + container_key, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
 
     def create_container_and_key(self, system_token=None):
         '''
@@ -105,7 +105,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.post(self.base_url, headers=headers)
         if res.status_code != 201:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
         container_key = res.json()['container_key']
         if isinstance(container_key, text_type):
             container_key = str(container_key)
@@ -124,7 +124,7 @@ class StorageProviderClient(object):
             headers = {'OpenAmSSOID': system_token}
         res = requests.delete(self.base_url + '/' + container_key, headers=headers)
         if res.status_code != 200:
-            raise InvalidStateException(res.status_code)
+            raise InvalidStateException(res.status_code, res.text)
 
 
 class InvalidStateException(Exception):
