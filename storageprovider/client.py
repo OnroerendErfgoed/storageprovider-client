@@ -10,7 +10,7 @@ class StorageProviderClient(object):
         self.base_url = base_url
 
     @staticmethod
-    def read_in_chunks(file_object, chunk_size=1024):
+    def _read_in_chunks(file_object, chunk_size=1024):
         while True:
             data = file_object.read(chunk_size)
             if not data:
@@ -65,7 +65,7 @@ class StorageProviderClient(object):
         if system_token:
             headers['OpenAmSSOID'] = system_token
         res = requests.put(self.base_url + '/' + container_key + '/' + object_key,
-                           data=self.read_in_chunks(object_data), headers=headers)
+                           data=self._read_in_chunks(object_data), headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 

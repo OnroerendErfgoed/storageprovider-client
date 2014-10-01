@@ -16,6 +16,14 @@ test_base_url = 'http://localhost:6543/container'
 here = os.path.dirname(__file__)
 
 
+class AnyObject():
+    def __init__(self):
+        pass
+
+    def __eq__(self, other):
+        return other is not None
+
+
 class StorageProviderTest(unittest.TestCase):
     def setUp(self):
         self.storageproviderclient = StorageProviderClient(test_base_url)
@@ -85,20 +93,18 @@ class StorageProviderTest(unittest.TestCase):
         with open(kasteel, 'rb') as f:
             bin_file = f.read()
         self.storageproviderclient.update_object(test_container_key, test_object_key, bin_file)
-        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key, bin_file,
-                                             headers={'content-type': 'application/octet-stream'})
+        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key,
+                                             data=AnyObject(), headers={'content-type': 'application/octet-stream'})
 
     @patch('storageprovider.client.requests')
     def test_update_object_system_token(self, mock_requests):
         kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
         mock_requests.put.return_value.status_code = 200
-        bin_file = None
         with open(kasteel, 'rb') as f:
-            bin_file = f.read()
-        self.storageproviderclient.update_object(test_container_key, test_object_key, bin_file, "x123-test")
-        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key, bin_file,
-                                             headers={"content-type": "application/octet-stream",
-                                                      "OpenAmSSOID": "x123-test"})
+            self.storageproviderclient.update_object(test_container_key, test_object_key, f, "x123-test")
+        mock_requests.put.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key,
+                                             data=AnyObject(), headers={"content-type": "application/octet-stream",
+                                                                        "OpenAmSSOID": "x123-test"})
 
     @patch('storageprovider.client.requests')
     def test_update_object_KO(self, mock_requests):
@@ -231,3 +237,13 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
         self.assertEqual('test error, http status code: 400', str(error))
+
+    def test_read_in_chunks(self):
+        kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
+        with open(kasteel, 'rb') as f:
+            gen = self.storageproviderclient._read_in_chunks(f)
+            res = gen.next()
+            self.assertIsNotNone(res)
+            self.assertEqual(1024, len(res))
+            for n in gen:
+                self.assertIsNotNone(n)
