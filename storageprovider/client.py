@@ -9,6 +9,14 @@ class StorageProviderClient(object):
     def __init__(self, base_url):
         self.base_url = base_url
 
+    @staticmethod
+    def read_in_chunks(file_object, chunk_size=1024):
+        while True:
+            data = file_object.read(chunk_size)
+            if not data:
+                break
+            yield data
+
     def delete_object(self, container_key, object_key, system_token=None):
         '''
         delete an object from the data store
@@ -56,7 +64,8 @@ class StorageProviderClient(object):
         headers = {'content-type': 'application/octet-stream'}
         if system_token:
             headers['OpenAmSSOID'] = system_token
-        res = requests.put(self.base_url + '/' + container_key + '/' + object_key, object_data, headers=headers)
+        res = requests.put(self.base_url + '/' + container_key + '/' + object_key,
+                           data=self.read_in_chunks(object_data), headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
