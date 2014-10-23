@@ -65,7 +65,7 @@ class StorageProviderClient(object):
         if system_token:
             headers['OpenAmSSOID'] = system_token
         res = requests.put(self.base_url + '/' + container_key + '/' + object_key,
-                           data=self._read_in_chunks(object_data), headers=headers)
+                           data=object_data, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
