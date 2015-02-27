@@ -73,6 +73,14 @@ class StorageProviderTest(unittest.TestCase):
                                              , headers={"OpenAmSSOID": "x123-test"})
 
     @patch('storageprovider.client.requests')
+    def test_get_object_custom_system_token(self, mock_requests):
+        storageproviderclient = StorageProviderClient(test_base_url, "system_token")
+        mock_requests.get.return_value.status_code = 200
+        storageproviderclient.get_object(test_container_key, test_object_key, "x123-test")
+        mock_requests.get.assert_called_with(test_base_url + '/' + test_container_key + '/' + test_object_key
+                                             , headers={"system_token": "x123-test"})
+
+    @patch('storageprovider.client.requests')
     def test_get_object_KO(self, mock_requests):
         error_thrown = False
         error = None
