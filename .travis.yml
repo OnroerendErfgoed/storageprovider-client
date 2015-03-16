@@ -11,4 +11,4 @@ install:
   - pip install -r requirements-dev-tci.txt
   - python setup.py develop
 script:
-  py.test --cov $PROJECT --cov-report term-missing tests
+  py.test --cov storageprovider-client --cov-report term-missing tests
