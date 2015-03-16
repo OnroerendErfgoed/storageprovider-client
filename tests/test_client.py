@@ -250,7 +250,7 @@ class StorageProviderTest(unittest.TestCase):
         kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
         with open(kasteel, 'rb') as f:
             gen = self.storageproviderclient._read_in_chunks(f)
-            res = gen.next()
+            res = gen.__next__() if hasattr(gen, '__next__') else gen.next()
             self.assertIsNotNone(res)
             self.assertEqual(1024, len(res))
             for n in gen:
