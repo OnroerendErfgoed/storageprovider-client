@@ -1,4 +1,0 @@
-[report]
-omit =
-pyoes/scripts/*
-pyoes/views.py
