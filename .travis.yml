@@ -1,0 +1,14 @@
+language: python
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+notifications:
+  email:
+    - bart.saelen@gesolutions.be
+    - klaas.millet@rwo.vlaanderen.be
+install:
+  - pip install -r requirements-dev-tci.txt
+  - python setup.py develop
+script:
+  py.test --cov actoren --cov-report term-missing tests
