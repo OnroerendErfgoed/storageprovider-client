@@ -12,3 +12,5 @@ install:
   - python setup.py develop
 script:
   py.test --cov storageprovider --cov-report term-missing tests
+after_success:
+  - coveralls
