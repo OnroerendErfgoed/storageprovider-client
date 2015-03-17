@@ -1,5 +1,5 @@
-1.1.0 (17/03/2015)
-==================
+1.1.0
+=====
 
 * Python 3.3 compatible
 * User can choose header
