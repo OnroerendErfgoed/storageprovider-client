@@ -6,7 +6,14 @@
 Welcome to Storageprovider-client's documentation!
 ==================================================
 
-Contents:
+
+Storageprovider-client is a library that provides methods to communicate with a Storageprovider instance. It provides methods to:
+
+* get/update/delete objects
+* get object keys
+* create/delete a container
+* ...
+
 
 .. toctree::
    :maxdepth: 2
