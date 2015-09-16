@@ -6,8 +6,9 @@ from six import text_type
 
 class StorageProviderClient(object):
 
-    def __init__(self, base_url, system_token_header='OpenAmSSOID'):
-        self.base_url = base_url
+    def __init__(self, base_url, collection, system_token_header='OpenAmSSOID'):
+        self.base_url = base_url + '/collections/' + collection
+        self.collection = collection
         self.system_token_header = system_token_header
 
     @staticmethod
@@ -30,7 +31,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.delete(self.base_url + '/' + container_key + '/' + object_key, headers=headers)
+        res = requests.delete(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
@@ -47,7 +48,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.get(self.base_url + '/' + container_key + '/' + object_key, headers=headers)
+        res = requests.get(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res.content
@@ -65,7 +66,7 @@ class StorageProviderClient(object):
         headers = {'content-type': 'application/octet-stream'}
         if system_token:
             headers[self.system_token_header] = system_token
-        res = requests.put(self.base_url + '/' + container_key + '/' + object_key,
+        res = requests.put(self.base_url + '/containers/' + container_key + '/' + object_key,
                            data=object_data, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
@@ -82,7 +83,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.get(self.base_url + '/' + container_key, headers=headers)
+        res = requests.get(self.base_url + '/containers/' + container_key, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res.content
@@ -98,7 +99,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.put(self.base_url + '/' + container_key, headers=headers)
+        res = requests.put(self.base_url + '/containers/' + container_key, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
@@ -113,7 +114,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.post(self.base_url, headers=headers)
+        res = requests.post(self.base_url + '/containers', headers=headers)
         if res.status_code != 201:
             raise InvalidStateException(res.status_code, res.text)
         container_key = res.json()['container_key']
@@ -132,7 +133,7 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.delete(self.base_url + '/' + container_key, headers=headers)
+        res = requests.delete(self.base_url + '/containers/' + container_key, headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
