@@ -1,3 +1,12 @@
+2.0.0 (16/10/2015)
+==================
+
+This release follows the structure outlined by `Augeias 0.1.0
+<https://github.com/OnroerendErfgoed/augeias/releases/tag/0.1.0>`_.
+
+Previous versions of storageprovider-client were written to communicate with a
+pre-release version of Augeias.
+
 1.1.0 (18/03/2015)
 ==================
 

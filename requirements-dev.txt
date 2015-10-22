@@ -7,3 +7,6 @@ pytest-cov==1.6
 py==1.4.20
 coveralls==0.4.4
 mock==1.0.1
+
+#Sphinx
+sphinx==1.3.1
