@@ -7,16 +7,20 @@ Welcome to Storageprovider-client's documentation!
 ==================================================
 
 
-Storageprovider-client is a library that provides methods to communicate with a Storageprovider instance. It provides methods to:
+Storageprovider-client is a library that provides methods to communicate with
+an `Augeias <https://augeias.readthedocs.org/en/latest/>`_ instance.
 
-* get/update/delete objects
-* get object keys
-* create/delete a container
-* ...
+This library makes it easy to:
 
+ * Add and delete containers
+ * Add, update and delete objects
+ * Look for objects in a container
+ * ...
 
 .. toctree::
    :maxdepth: 2
+
+   history
 
 
 
