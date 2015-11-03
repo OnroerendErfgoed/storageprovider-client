@@ -100,6 +100,27 @@ class StorageProviderTest(unittest.TestCase):
         self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
+    def test_get_object_metadata(self, mock_requests):
+        mock_requests.head.return_value.status_code = 200
+        self.storageproviderclient.get_object_metadata(test_container_key, test_object_key)
+        mock_requests.head.assert_called_with(
+            test_check_url + '/containers/' + test_container_key + '/' + test_object_key, headers={})
+
+    @patch('storageprovider.client.requests')
+    def test_get_object_metadata_system_token(self, mock_requests):
+        mock_requests.head.return_value.status_code = 200
+        self.storageproviderclient.get_object_metadata(test_container_key, test_object_key, "x123-test")
+        mock_requests.head.assert_called_with(
+            test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
+            headers={'OpenAmSSOID': 'x123-test'})
+
+    @patch('storageprovider.client.requests')
+    def test_get_object_metadata_KO(self, mock_requests):
+        mock_requests.head.return_value.status_code = 400
+        self.assertRaises(InvalidStateException, self.storageproviderclient.get_object_metadata, test_container_key,
+                          test_object_key)
+
+    @patch('storageprovider.client.requests')
     def test_update_object(self, mock_requests):
         kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
         mock_requests.put.return_value.status_code = 200

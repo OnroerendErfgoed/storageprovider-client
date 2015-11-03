@@ -53,6 +53,24 @@ class StorageProviderClient(object):
             raise InvalidStateException(res.status_code, res.text)
         return res.content
 
+    def get_object_metadata(self, container_key, object_key, system_token=None):
+        '''
+        retrieve an object from the data store
+
+        :param container_key: key of the container in the data store
+        :param object_key: specific object key for the object in the container
+        :param system_token: oauth system token
+        :return content of the object
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        headers = {}
+        if system_token:
+            headers = {self.system_token_header: system_token}
+        res = requests.head(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+        return res.headers
+
     def update_object(self, container_key, object_key, object_data, system_token=None):
         '''
         update (or create) an object in the data store
