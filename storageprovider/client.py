@@ -60,7 +60,7 @@ class StorageProviderClient(object):
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
-        :return content of the object
+        :return headers of the object
         :raises InvalidStateException: if the response is in an invalid state
         '''
         headers = {}
