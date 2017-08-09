@@ -158,6 +158,63 @@ class StorageProviderTest(unittest.TestCase):
         self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
+    def test_create_object_and_key_system_token(self, mock_requests):
+        kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
+        mock_requests.post.return_value.status_code = 201
+        mock_requests.post.return_value.json = Mock(return_value={'object_key': u'jk455'})
+        with open(kasteel, 'rb') as f:
+            res = self.storageproviderclient.update_object_and_key(test_container_key, f, "x123-test")
+        mock_requests.post.assert_called_with(
+            test_check_url + '/containers/' + test_container_key, data=AnyObject(),
+            headers={"content-type": "application/octet-stream", "OpenAmSSOID": "x123-test"})
+        self.assertEqual('jk455', res)
+
+    @patch('storageprovider.client.requests')
+    def test_create_object_and_key_KO(self, mock_requests):
+        kasteel = os.path.join(here, '..', 'fixtures/kasteel.jpg')
+        mock_requests.post.return_value.status_code = 400
+        mock_requests.post.return_value.json = Mock(return_value={'object_key': u'jk455'})
+        with open(kasteel, 'rb') as f:
+            self.assertRaises(InvalidStateException, self.storageproviderclient.update_object_and_key,
+                              test_container_key, f, "x123-test")
+
+    @patch('storageprovider.client.requests')
+    def test_copy_object_create_key_system_token(self, mock_requests):
+        mock_requests.post.return_value.status_code = 201
+        mock_requests.post.return_value.json = Mock(return_value={'object_key': u'jk455'})
+        res = self.storageproviderclient.copy_object_and_create_key(
+            "source_container_key", "source_object_key", test_container_key, "x123-test")
+        mock_requests.post.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            json={'url': test_check_url + '/containers/source_container_key/source_object_key'},
+            headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
+        self.assertEqual('jk455', res)
+
+    @patch('storageprovider.client.requests')
+    def test_copy_object_create_key_KO(self, mock_requests):
+        mock_requests.post.return_value.status_code = 400
+        mock_requests.post.return_value.json = Mock(return_value={'object_key': u'jk455'})
+        self.assertRaises(InvalidStateException, self.storageproviderclient.copy_object_and_create_key,
+                          "source_container_key", "source_object_key", test_container_key, "x123-test")
+
+    @patch('storageprovider.client.requests')
+    def test_copy_object_system_token(self, mock_requests):
+        mock_requests.put.return_value.status_code = 200
+        self.storageproviderclient.copy_object("source_container_key", "source_object_key",
+                                               test_container_key, test_object_key, "x123-test")
+        mock_requests.put.assert_called_with(
+            test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
+            json={'url': test_check_url + '/containers/source_container_key/source_object_key'},
+            headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
+
+    @patch('storageprovider.client.requests')
+    def test_copy_object_KO(self, mock_requests):
+        mock_requests.put.return_value.status_code = 400
+        self.assertRaises(InvalidStateException, self.storageproviderclient.copy_object,
+                          "source_container_key", "source_object_key",
+                          test_container_key, test_object_key, "x123-test")
+
+    @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.list_object_keys_for_container(test_container_key)
