@@ -186,7 +186,12 @@ class StorageProviderTest(unittest.TestCase):
             "source_container_key", "source_object_key", test_container_key, "x123-test")
         mock_requests.post.assert_called_with(
             test_check_url + '/containers/' + test_container_key,
-            json={'url': test_check_url + '/containers/source_container_key/source_object_key'},
+            json={
+                'host_url': test_base_url,
+                'collection_key': test_collection_key,
+                'container_key': 'source_container_key',
+                'object_key': 'source_object_key'
+            },
             headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
         self.assertEqual('jk455', res)
 
@@ -204,7 +209,12 @@ class StorageProviderTest(unittest.TestCase):
                                                test_container_key, test_object_key, "x123-test")
         mock_requests.put.assert_called_with(
             test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
-            json={'url': test_check_url + '/containers/source_container_key/source_object_key'},
+            json={
+                'host_url': test_base_url,
+                'collection_key': test_collection_key,
+                'container_key': 'source_container_key',
+                'object_key': 'source_object_key'
+            },
             headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
 
     @patch('storageprovider.client.requests')

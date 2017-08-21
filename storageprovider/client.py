@@ -7,6 +7,7 @@ from six import text_type
 class StorageProviderClient(object):
 
     def __init__(self, base_url, collection, system_token_header='OpenAmSSOID'):
+        self.host_url = base_url
         self.base_url = base_url + '/collections/' + collection
         self.collection = collection
         self.system_token_header = system_token_header
@@ -85,7 +86,12 @@ class StorageProviderClient(object):
         headers = {'content-type': 'application/json'}
         if system_token:
             headers[self.system_token_header] = system_token
-        object_data = {'url': self.base_url + '/containers/' + source_container_key + '/' + source_object_key}
+        object_data = {
+            'host_url': self.host_url,
+            'collection_key': self.collection,
+            'container_key': source_container_key,
+            'object_key': source_object_key
+        }
         res = requests.post(self.base_url + '/containers/' + output_container_key, json=object_data, headers=headers)
         if res.status_code != 201:
             raise InvalidStateException(res.status_code, res.text)
@@ -109,7 +115,12 @@ class StorageProviderClient(object):
         headers = {'content-type': 'application/json'}
         if system_token:
             headers[self.system_token_header] = system_token
-        object_data = {'url': self.base_url + '/containers/' + source_container_key + '/' + source_object_key}
+        object_data = {
+            'host_url': self.host_url,
+            'collection_key': self.collection,
+            'container_key': source_container_key,
+            'object_key': source_object_key
+        }
         res = requests.put(self.base_url + '/containers/' + output_container_key + '/' + output_object_key,
                            json=object_data, headers=headers)
         if res.status_code != 200:
