@@ -36,6 +36,15 @@ class StorageProviderClient(object):
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
 
+    def _get_object_res(self, container_key, object_key, system_token):
+        headers = {}
+        if system_token:
+            headers = {self.system_token_header: system_token}
+        res = requests.get(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+        return res
+
     def get_object(self, container_key, object_key, system_token=None):
         '''
         retrieve an object from the data store
@@ -46,13 +55,24 @@ class StorageProviderClient(object):
         :return content of the object
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        headers = {}
-        if system_token:
-            headers = {self.system_token_header: system_token}
-        res = requests.get(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
-        if res.status_code != 200:
-            raise InvalidStateException(res.status_code, res.text)
+        res = self._get_object_res(container_key, object_key, system_token)
         return res.content
+
+    def get_object_and_metadata(self, container_key, object_key, system_token=None):
+        '''
+        retrieve an object from the data store and also return header meta data
+
+        :param container_key: key of the container in the data store
+        :param object_key: specific object key for the object in the container
+        :param system_token: oauth system token
+        :return content of the object
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        res = self._get_object_res(container_key, object_key, system_token)
+        return {
+            "object": res.content,
+            "metadata": res.headers
+        }
 
     def get_object_metadata(self, container_key, object_key, system_token=None):
         '''

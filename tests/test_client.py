@@ -100,6 +100,15 @@ class StorageProviderTest(unittest.TestCase):
         self.assertEqual(400, error.status_code)
 
     @patch('storageprovider.client.requests')
+    def test_get_object_and_metadata(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        object_dict = self.storageproviderclient.get_object_and_metadata(test_container_key, test_object_key)
+        mock_requests.get.assert_called_with(
+            test_check_url + '/containers/' + test_container_key + '/' + test_object_key, headers={})
+        self.assertIn('object', object_dict)
+        self.assertIn('metadata', object_dict)
+
+    @patch('storageprovider.client.requests')
     def test_get_object_metadata(self, mock_requests):
         mock_requests.head.return_value.status_code = 200
         self.storageproviderclient.get_object_metadata(test_container_key, test_object_key)
