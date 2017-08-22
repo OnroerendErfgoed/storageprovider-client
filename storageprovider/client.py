@@ -7,6 +7,7 @@ from six import text_type
 class StorageProviderClient(object):
 
     def __init__(self, base_url, collection, system_token_header='OpenAmSSOID'):
+        self.host_url = base_url
         self.base_url = base_url + '/collections/' + collection
         self.collection = collection
         self.system_token_header = system_token_header
@@ -70,6 +71,80 @@ class StorageProviderClient(object):
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res.headers
+
+    def copy_object_and_create_key(self, source_container_key, source_object_key, output_container_key,
+                                   system_token=None):
+        '''
+        Copy an object and create key in the data store
+
+        :param source_container_key: key of the source container in the data store
+        :param source_object_key: key of the source object in the container
+        :param output_container_key: key of output container in the data store
+        :param system_token: oauth system token
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        headers = {'content-type': 'application/json'}
+        if system_token:
+            headers[self.system_token_header] = system_token
+        object_data = {
+            'host_url': self.host_url,
+            'collection_key': self.collection,
+            'container_key': source_container_key,
+            'object_key': source_object_key
+        }
+        res = requests.post(self.base_url + '/containers/' + output_container_key, json=object_data, headers=headers)
+        if res.status_code != 201:
+            raise InvalidStateException(res.status_code, res.text)
+        object_key = res.json()['object_key']
+        if isinstance(object_key, text_type):
+            object_key = str(object_key)
+        return object_key
+
+    def copy_object(self, source_container_key, source_object_key, output_container_key, output_object_key,
+                    system_token=None):
+        '''
+        Copy an object in the data store to specific key
+
+        :param source_container_key: key of the source container in the data store
+        :param source_object_key: key of the source object in the container
+        :param output_container_key: key of output container in the data store
+        :param output_object_key: specific object key for the output object in the container
+        :param system_token: oauth system token
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        headers = {'content-type': 'application/json'}
+        if system_token:
+            headers[self.system_token_header] = system_token
+        object_data = {
+            'host_url': self.host_url,
+            'collection_key': self.collection,
+            'container_key': source_container_key,
+            'object_key': source_object_key
+        }
+        res = requests.put(self.base_url + '/containers/' + output_container_key + '/' + output_object_key,
+                           json=object_data, headers=headers)
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+
+    def update_object_and_key(self, container_key, object_data, system_token=None):
+        '''
+       create an object and key in the data store
+
+        :param container_key: key of the container in the data store
+        :param object_data: data of the object
+        :param system_token: oauth system token
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        headers = {'content-type': 'application/octet-stream'}
+        if system_token:
+            headers[self.system_token_header] = system_token
+        res = requests.post(self.base_url + '/containers/' + container_key, data=object_data, headers=headers)
+        if res.status_code != 201:
+            raise InvalidStateException(res.status_code, res.text)
+        object_key = res.json()['object_key']
+        if isinstance(object_key, text_type):
+            object_key = str(object_key)
+        return object_key
 
     def update_object(self, container_key, object_key, object_data, system_token=None):
         '''
