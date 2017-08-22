@@ -1,7 +1,7 @@
 2.2.0 (22/08/2017)
 ==================
 
-* Update to augeias 0.3.0.
+* Update to `Augeias 0.3.0 <https://github.com/OnroerendErfgoed/augeias/releases/tag/0.3.0>`_.
 * Add update_object_and_key method to store an object and create a key
 * Add copy_object_and_create_key to copy an object to a new create key in the same storage provider
 * Add copy_object to copy an object to a specific key in the same storage provider
