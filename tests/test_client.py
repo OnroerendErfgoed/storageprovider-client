@@ -237,14 +237,15 @@ class StorageProviderTest(unittest.TestCase):
     def test_list_object_keys_for_container(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.list_object_keys_for_container(test_container_key)
-        mock_requests.get.assert_called_with(test_check_url + '/containers/' + test_container_key, headers={})
+        mock_requests.get.assert_called_with(test_check_url + '/containers/'
+                                             + test_container_key, headers={'Accept': 'application/json'})
 
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.list_object_keys_for_container(test_container_key, "x123-test")
         mock_requests.get.assert_called_with(test_check_url + '/containers/' + test_container_key,
-                                             headers={"OpenAmSSOID": "x123-test"})
+                                             headers={'Accept': 'application/json',"OpenAmSSOID": "x123-test"})
 
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container_KO(self, mock_requests):
@@ -253,6 +254,36 @@ class StorageProviderTest(unittest.TestCase):
         mock_requests.get.return_value.status_code = 400
         try:
             self.storageproviderclient.list_object_keys_for_container(test_container_key)
+        except InvalidStateException as ise:
+            error_thrown = True
+            error = ise
+        self.assertTrue(error_thrown)
+        self.assertEqual(400, error.status_code)
+
+    @patch('storageprovider.client.requests')
+    def test_get_container_data(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_container_data(test_container_key)
+        mock_requests.get.assert_called_with(test_check_url + '/containers/'
+                                             + test_container_key, headers={
+            'Accept': 'application/zip'})
+
+    @patch('storageprovider.client.requests')
+    def test_get_container_system_token(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_container_data(test_container_key,
+                                                      "x123-test")
+        mock_requests.get.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={'Accept': 'application/zip', "OpenAmSSOID": "x123-test"})
+
+    @patch('storageprovider.client.requests')
+    def test_get_container_KO(self, mock_requests):
+        error_thrown = False
+        error = None
+        mock_requests.get.return_value.status_code = 400
+        try:
+            self.storageproviderclient.get_container_data(test_container_key)
         except InvalidStateException as ise:
             error_thrown = True
             error = ise
