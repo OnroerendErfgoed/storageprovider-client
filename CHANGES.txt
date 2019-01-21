@@ -1,3 +1,9 @@
+2.4.0 (21/01/2019)
+==================
+
+* Add accept header to list_object_keys_for_container operation (#16)
+* Add download zip to list of operations (#15)
+
 2.3.0 (22/08/2017)
 ==================
 
