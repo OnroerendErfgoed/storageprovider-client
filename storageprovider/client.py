@@ -193,10 +193,29 @@ class StorageProviderClient(object):
         :return list of object keys found in the container
         :raises InvalidStateException: if the response is in an invalid state
         '''
-        headers = {}
+        headers = {'Accept': 'application/json'}
         if system_token:
-            headers = {self.system_token_header: system_token}
-        res = requests.get(self.base_url + '/containers/' + container_key, headers=headers)
+            headers.update({self.system_token_header: system_token})
+        res = requests.get(self.base_url + '/containers/' + container_key,
+                           headers=headers)
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+        return res.content
+
+    def get_container_data(self, container_key, system_token=None):
+        '''
+        list all object keys for a container in the data store
+
+        :param container_key: key of the container in the data store
+        :param system_token: oauth system token
+        :return list of object keys found in the container
+        :raises InvalidStateException: if the response is in an invalid state
+        '''
+        headers = {'Accept': 'application/zip'}
+        if system_token:
+            headers.update({self.system_token_header: system_token})
+        res = requests.get(self.base_url + '/containers/' + container_key,
+                           headers=headers)
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res.content
