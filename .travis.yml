@@ -2,14 +2,9 @@ language: python
 sudo: false
 python:
   - "2.7"
-  - "3.3"
-  - "3.4"
-notifications:
-  email:
-    - bart.saelen@gesolutions.be
-    - klaas.millet@rwo.vlaanderen.be
+  - "3.6"
 install:
-  - pip install -r requirements-dev-tci.txt
+  - pip install -r requirements-dev.txt
   - python setup.py develop
 script:
   py.test --cov storageprovider --cov-report term-missing tests

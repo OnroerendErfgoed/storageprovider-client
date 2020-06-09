@@ -264,9 +264,23 @@ class StorageProviderTest(unittest.TestCase):
     def test_get_container_data(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_container_data(test_container_key)
-        mock_requests.get.assert_called_with(test_check_url + '/containers/'
-                                             + test_container_key, headers={
-            'Accept': 'application/zip'})
+        mock_requests.get.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={'Accept': 'application/zip'},
+            params={}
+        )
+
+    @patch('storageprovider.client.requests')
+    def test_get_container_data_translations(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_container_data(
+            test_container_key, translations={'001': 'filename.pdf'}
+        )
+        mock_requests.get.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={'Accept': 'application/zip'},
+            params={'001': 'filename.pdf'}
+        )
 
     @patch('storageprovider.client.requests')
     def test_get_container_system_token(self, mock_requests):
@@ -275,7 +289,9 @@ class StorageProviderTest(unittest.TestCase):
                                                       "x123-test")
         mock_requests.get.assert_called_with(
             test_check_url + '/containers/' + test_container_key,
-            headers={'Accept': 'application/zip', "OpenAmSSOID": "x123-test"})
+            headers={'Accept': 'application/zip', "OpenAmSSOID": "x123-test"},
+            params={}
+        )
 
     @patch('storageprovider.client.requests')
     def test_get_container_KO(self, mock_requests):
