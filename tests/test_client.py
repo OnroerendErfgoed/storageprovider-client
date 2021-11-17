@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import os
 import unittest
-from storageprovider.client import StorageProviderClient, InvalidStateException
+from unittest.mock import Mock
+from unittest.mock import patch
 
-try:
-    from unittest.mock import Mock, patch
-except ImportError:
-    from mock import Mock, patch  # pragma: no cover
+from storageprovider.client import InvalidStateException
+from storageprovider.client import StorageProviderClient
 
 test_collection_key = 'test_collection'
 test_container_key = 'test_container_key'
@@ -110,18 +107,55 @@ class StorageProviderTest(unittest.TestCase):
 
     @patch('storageprovider.client.requests')
     def test_get_object_metadata(self, mock_requests):
-        mock_requests.head.return_value.status_code = 200
-        self.storageproviderclient.get_object_metadata(test_container_key, test_object_key)
-        mock_requests.head.assert_called_with(
-            test_check_url + '/containers/' + test_container_key + '/' + test_object_key, headers={})
+        mock_requests.get.return_value.status_code = 200
+        mock_requests.get.return_value.json.return_value = {
+            "time_last_modification": "2016-03-30T09:51:45",
+            "size": 22878,
+            "mime": "application/pdf",
+        }
+        result = self.storageproviderclient.get_object_metadata(
+            test_container_key, test_object_key
+        )
+        mock_requests.get.assert_called_with(
+            f"{test_check_url}/containers/{test_container_key}/{test_object_key}/meta",
+            headers={}
+        )
+        self.assertEqual(
+            {
+                'time_last_modification': '2016-03-30T09:51:45',
+                'size': 22878,
+                'mime': 'application/pdf',
+                'Content-Type': 'application/pdf',
+                'Content-Length': 22878
+            },
+            result
+        )
 
     @patch('storageprovider.client.requests')
     def test_get_object_metadata_system_token(self, mock_requests):
-        mock_requests.head.return_value.status_code = 200
-        self.storageproviderclient.get_object_metadata(test_container_key, test_object_key, "x123-test")
-        mock_requests.head.assert_called_with(
-            test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
-            headers={'OpenAmSSOID': 'x123-test'})
+        mock_requests.get.return_value.status_code = 200
+        mock_requests.get.return_value.json.return_value = {
+            "time_last_modification": "2016-03-30T09:51:45",
+            "size": 22878,
+            "mime": "application/pdf",
+        }
+        result = self.storageproviderclient.get_object_metadata(
+            test_container_key, test_object_key, system_token="x123-test"
+        )
+        mock_requests.get.assert_called_with(
+            f"{test_check_url}/containers/{test_container_key}/{test_object_key}/meta",
+            headers={'OpenAmSSOID': 'x123-test'}
+        )
+        self.assertEqual(
+            {
+                'time_last_modification': '2016-03-30T09:51:45',
+                'size': 22878,
+                'mime': 'application/pdf',
+                'Content-Type': 'application/pdf',
+                'Content-Length': 22878
+            },
+            result
+        )
 
     @patch('storageprovider.client.requests')
     def test_get_object_metadata_KO(self, mock_requests):
