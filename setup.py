@@ -14,7 +14,7 @@ requires = [
 ]
 
 setup(name='storageprovider-client',
-      version='2.5.0',
+      version='2.6.0',
       description='storageprovider client',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
