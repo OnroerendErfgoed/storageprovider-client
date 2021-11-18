@@ -11,11 +11,10 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'requests',
-    'six',
 ]
 
 setup(name='storageprovider-client',
-      version='2.5.0',
+      version='2.6.0',
       description='storageprovider client',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -38,4 +37,3 @@ setup(name='storageprovider-client',
       main = storageprovider:main
       """,
 )
-

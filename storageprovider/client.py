@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import requests
-from six import text_type
 
 
-class StorageProviderClient(object):
+class StorageProviderClient:
 
     def __init__(self, base_url, collection, system_token_header='OpenAmSSOID'):
         self.host_url = base_url
@@ -69,9 +66,12 @@ class StorageProviderClient(object):
         :raises InvalidStateException: if the response is in an invalid state
         '''
         res = self._get_object_res(container_key, object_key, system_token)
+        metadata = res.headers
+        metadata["mime"] = metadata["Content-Type"]
+        metadata["size"] = metadata["Content-Length"]
         return {
             "object": res.content,
-            "metadata": res.headers
+            "metadata": metadata
         }
 
     def get_object_metadata(self, container_key, object_key, system_token=None):
@@ -87,10 +87,16 @@ class StorageProviderClient(object):
         headers = {}
         if system_token:
             headers = {self.system_token_header: system_token}
-        res = requests.head(self.base_url + '/containers/' + container_key + '/' + object_key, headers=headers)
+        res = requests.get(
+            f"{self.base_url}/containers/{container_key}/{object_key}/meta",
+            headers=headers
+        )
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
-        return res.headers
+        result = res.json()
+        result["Content-Type"] = result["mime"]  # backwards compatibility
+        result["Content-Length"] = result["size"]  # backwards compatibility
+        return result
 
     def copy_object_and_create_key(self, source_container_key, source_object_key, output_container_key,
                                    system_token=None):
@@ -116,7 +122,7 @@ class StorageProviderClient(object):
         if res.status_code != 201:
             raise InvalidStateException(res.status_code, res.text)
         object_key = res.json()['object_key']
-        if isinstance(object_key, text_type):
+        if isinstance(object_key, str):
             object_key = str(object_key)
         return object_key
 
@@ -162,7 +168,7 @@ class StorageProviderClient(object):
         if res.status_code != 201:
             raise InvalidStateException(res.status_code, res.text)
         object_key = res.json()['object_key']
-        if isinstance(object_key, text_type):
+        if isinstance(object_key, str):
             object_key = str(object_key)
         return object_key
 
@@ -255,7 +261,7 @@ class StorageProviderClient(object):
         if res.status_code != 201:
             raise InvalidStateException(res.status_code, res.text)
         container_key = res.json()['container_key']
-        if isinstance(container_key, text_type):
+        if isinstance(container_key, str):
             container_key = str(container_key)
         return container_key
 
