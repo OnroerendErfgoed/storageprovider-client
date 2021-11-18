@@ -11,7 +11,6 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'requests',
-    'six',
 ]
 
 setup(name='storageprovider-client',
@@ -38,4 +37,3 @@ setup(name='storageprovider-client',
       main = storageprovider:main
       """,
 )
-
