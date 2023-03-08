@@ -43,7 +43,8 @@ class StorageProviderTest(unittest.TestCase):
         self.storageproviderclient.delete_object(test_container_key, test_object_key, "x123-test")
         mock_requests.delete.assert_called_with(
             test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
-            headers={"OpenAmSSOID": "x123-test"})
+            headers={"Authorization": "Bearer x123-test"}
+        )
 
     @patch('storageprovider.client.requests')
     def test_delete_object_KO(self, mock_requests):
@@ -71,17 +72,19 @@ class StorageProviderTest(unittest.TestCase):
         self.storageproviderclient.get_object(test_container_key, test_object_key, "x123-test")
         mock_requests.get.assert_called_with(
             test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
-            headers={"OpenAmSSOID": "x123-test"})
+            headers={"Authorization": "Bearer x123-test"}
+        )
 
     @patch('storageprovider.client.requests')
     def test_get_object_custom_system_token(self, mock_requests):
-        storageproviderclient = StorageProviderClient(test_base_url, test_collection_key,
-                                                      system_token_header="system_token")
+        storageproviderclient = StorageProviderClient(
+            test_base_url, test_collection_key
+        )
         mock_requests.get.return_value.status_code = 200
         storageproviderclient.get_object(test_container_key, test_object_key, "x123-test")
         mock_requests.get.assert_called_with(
             test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
-            headers={"system_token": "x123-test"})
+            headers={"Authorization": "Bearer x123-test"})
 
     @patch('storageprovider.client.requests')
     def test_get_object_KO(self, mock_requests):
@@ -144,7 +147,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         mock_requests.get.assert_called_with(
             f"{test_check_url}/containers/{test_container_key}/{test_object_key}/meta",
-            headers={'OpenAmSSOID': 'x123-test'}
+            headers={'Authorization': 'Bearer x123-test'}
         )
         self.assertEqual(
             {
@@ -182,8 +185,13 @@ class StorageProviderTest(unittest.TestCase):
         with open(kasteel, 'rb') as f:
             self.storageproviderclient.update_object(test_container_key, test_object_key, f, "x123-test")
         mock_requests.put.assert_called_with(
-            test_check_url + '/containers/' + test_container_key + '/' + test_object_key, data=AnyObject(),
-            headers={"content-type": "application/octet-stream", "OpenAmSSOID": "x123-test"})
+            test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
+            data=AnyObject(),
+            headers={
+                "content-type": "application/octet-stream",
+                "Authorization": "Bearer x123-test"
+            }
+        )
 
     @patch('storageprovider.client.requests')
     def test_update_object_KO(self, mock_requests):
@@ -209,7 +217,11 @@ class StorageProviderTest(unittest.TestCase):
             res = self.storageproviderclient.update_object_and_key(test_container_key, f, "x123-test")
         mock_requests.post.assert_called_with(
             test_check_url + '/containers/' + test_container_key, data=AnyObject(),
-            headers={"content-type": "application/octet-stream", "OpenAmSSOID": "x123-test"})
+            headers={
+                "content-type": "application/octet-stream",
+                "Authorization": "Bearer x123-test"
+            }
+        )
         self.assertEqual('jk455', res)
 
     @patch('storageprovider.client.requests')
@@ -235,7 +247,8 @@ class StorageProviderTest(unittest.TestCase):
                 'container_key': 'source_container_key',
                 'object_key': 'source_object_key'
             },
-            headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
+            headers={"content-type": "application/json",
+                     "Authorization": "Bearer x123-test"})
         self.assertEqual('jk455', res)
 
     @patch('storageprovider.client.requests')
@@ -248,8 +261,12 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_copy_object_system_token(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
-        self.storageproviderclient.copy_object("source_container_key", "source_object_key",
-                                               test_container_key, test_object_key, "x123-test")
+        self.storageproviderclient.copy_object(
+            "source_container_key",
+            "source_object_key",
+            test_container_key,
+            test_object_key, "x123-test"
+        )
         mock_requests.put.assert_called_with(
             test_check_url + '/containers/' + test_container_key + '/' + test_object_key,
             json={
@@ -258,7 +275,11 @@ class StorageProviderTest(unittest.TestCase):
                 'container_key': 'source_container_key',
                 'object_key': 'source_object_key'
             },
-            headers={"content-type": "application/json", "OpenAmSSOID": "x123-test"})
+            headers={
+                "content-type": "application/json",
+                "Authorization": "Bearer x123-test"
+            }
+        )
 
     @patch('storageprovider.client.requests')
     def test_copy_object_KO(self, mock_requests):
@@ -277,9 +298,12 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
-        self.storageproviderclient.list_object_keys_for_container(test_container_key, "x123-test")
-        mock_requests.get.assert_called_with(test_check_url + '/containers/' + test_container_key,
-                                             headers={'Accept': 'application/json',"OpenAmSSOID": "x123-test"})
+        self.storageproviderclient.list_object_keys_for_container(test_container_key,
+                                                                  "x123-test")
+        mock_requests.get.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={'Accept': 'application/json', "Authorization": "Bearer x123-test"}
+        )
 
     @patch('storageprovider.client.requests')
     def test_list_object_keys_for_container_KO(self, mock_requests):
@@ -323,7 +347,7 @@ class StorageProviderTest(unittest.TestCase):
                                                       "x123-test")
         mock_requests.get.assert_called_with(
             test_check_url + '/containers/' + test_container_key,
-            headers={'Accept': 'application/zip', "OpenAmSSOID": "x123-test"},
+            headers={'Accept': 'application/zip', "Authorization": "Bearer x123-test"},
             params={}
         )
 
@@ -350,8 +374,10 @@ class StorageProviderTest(unittest.TestCase):
     def test_create_container_system_token(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
         self.storageproviderclient.create_container(test_container_key, "x123-test")
-        mock_requests.put.assert_called_with(test_check_url + '/containers/' + test_container_key,
-                                             headers={"OpenAmSSOID": "x123-test"})
+        mock_requests.put.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={"Authorization": "Bearer x123-test"}
+        )
 
     @patch('storageprovider.client.requests')
     def test_create_container_KO(self, mock_requests):
@@ -377,9 +403,12 @@ class StorageProviderTest(unittest.TestCase):
     @patch('storageprovider.client.requests')
     def test_create_container_and_key_system_token(self, mock_requests):
         mock_requests.post.return_value.status_code = 201
-        mock_requests.post.return_value.json = Mock(return_value={'container_key': u'jk455'})
+        mock_requests.post.return_value.json = Mock(
+            return_value={'container_key': u'jk455'})
         res = self.storageproviderclient.create_container_and_key("x123-test")
-        mock_requests.post.assert_called_with(test_check_url + '/containers', headers={"OpenAmSSOID": "x123-test"})
+        mock_requests.post.assert_called_with(
+            test_check_url + '/containers', headers={"Authorization": "Bearer x123-test"}
+        )
         self.assertEqual('jk455', res)
 
     @patch('storageprovider.client.requests')
@@ -413,8 +442,10 @@ class StorageProviderTest(unittest.TestCase):
     def test_delete_container_system_token(self, mock_requests):
         mock_requests.delete.return_value.status_code = 200
         self.storageproviderclient.delete_container(test_container_key, "x123-test")
-        mock_requests.delete.assert_called_with(test_check_url + '/containers/' + test_container_key,
-                                                headers={"OpenAmSSOID": "x123-test"})
+        mock_requests.delete.assert_called_with(
+            test_check_url + '/containers/' + test_container_key,
+            headers={"Authorization": "Bearer x123-test"}
+        )
 
     @patch('storageprovider.client.requests')
     def test_delete_container_KO(self, mock_requests):
