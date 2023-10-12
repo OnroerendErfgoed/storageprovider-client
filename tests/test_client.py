@@ -88,6 +88,7 @@ class StorageProviderTest(unittest.TestCase):
             + "/"
             + test_object_key,
             headers={},
+            stream=True,
         )
 
     @patch("storageprovider.client.requests")
@@ -446,6 +447,7 @@ class StorageProviderTest(unittest.TestCase):
             test_check_url + "/containers/" + test_container_key,
             headers={"Accept": "application/zip"},
             params={},
+            stream=True,
         )
 
     @patch("storageprovider.client.requests")
