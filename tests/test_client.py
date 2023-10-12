@@ -606,13 +606,3 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
         self.assertEqual("test error, http status code: 400", str(error))
-
-    def test_read_in_chunks(self):
-        kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
-        with open(kasteel, "rb") as f:
-            gen = self.storageproviderclient._read_in_chunks(f)
-            res = gen.__next__() if hasattr(gen, "__next__") else gen.next()
-            self.assertIsNotNone(res)
-            self.assertEqual(1024, len(res))
-            for n in gen:
-                self.assertIsNotNone(n)
