@@ -8,14 +8,6 @@ class StorageProviderClient:
         self.collection = collection
 
     @staticmethod
-    def _read_in_chunks(file_object, chunk_size=1024):
-        while True:
-            data = file_object.read(chunk_size)
-            if not data:
-                break
-            yield data
-
-    @staticmethod
     def get_auth_header(system_token):
         return {"Authorization": f"Bearer {system_token}"}
 
@@ -49,6 +41,27 @@ class StorageProviderClient:
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res
+
+    def get_object_streaming(self, container_key, object_key, system_token=None):
+        """
+        retrieve an object from the data store as a stream
+        :param container_key: key of the container in the data store
+        :param object_key: specific object key for the object in the container
+        :param system_token: oauth system token
+        :return content of the object as a stream
+        :raises InvalidStateException: if the response is in an invalid state
+        """
+        headers = {}
+        if system_token:
+            headers = {self.system_token_header: system_token}
+        res = requests.get(
+            self.base_url + "/containers/" + container_key + "/" + object_key,
+            headers=headers,
+            stream=True,
+        )
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+        return res.iter_content(1024 * 1024)
 
     def get_object(self, container_key, object_key, system_token=None):
         """
@@ -242,6 +255,31 @@ class StorageProviderClient:
         if res.status_code != 200:
             raise InvalidStateException(res.status_code, res.text)
         return res.content
+
+    def get_container_data_streaming(
+        self, container_key, system_token=None, translations=None
+    ):
+        """
+        Retrieve a zip of a container in the data store as a stream
+        :param container_key: key of the container in the data store
+        :param system_token: oauth system token
+        :param translations: Dict of object IDs and file names to use for them.
+        :return zip of objects as a stream
+        :raises InvalidStateException: if the response is in an invalid state
+        """
+        translations = translations or {}
+        headers = {"Accept": "application/zip"}
+        if system_token:
+            headers.update({self.system_token_header: system_token})
+        res = requests.get(
+            self.base_url + "/containers/" + container_key,
+            params=translations,
+            headers=headers,
+            stream=True,
+        )
+        if res.status_code != 200:
+            raise InvalidStateException(res.status_code, res.text)
+        return res.iter_content(1024 * 1024)
 
     def get_container_data(self, container_key, system_token=None, translations=None):
         """

@@ -76,6 +76,21 @@ class StorageProviderTest(unittest.TestCase):
         self.assertEqual(400, error.status_code)
 
     @patch("storageprovider.client.requests")
+    def test_get_object_streaming(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_object_streaming(
+            test_container_key, test_object_key
+        )
+        mock_requests.get.assert_called_with(
+            test_check_url
+            + "/containers/"
+            + test_container_key
+            + "/"
+            + test_object_key,
+            headers={},
+        )
+
+    @patch("storageprovider.client.requests")
     def test_get_object(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object(test_container_key, test_object_key)
@@ -422,6 +437,16 @@ class StorageProviderTest(unittest.TestCase):
             error = ise
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
+
+    @patch("storageprovider.client.requests")
+    def test_get_container_data_streaming(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_container_data_streaming(test_container_key)
+        mock_requests.get.assert_called_with(
+            test_check_url + "/containers/" + test_container_key,
+            headers={"Accept": "application/zip"},
+            params={},
+        )
 
     @patch("storageprovider.client.requests")
     def test_get_container_data(self, mock_requests):
