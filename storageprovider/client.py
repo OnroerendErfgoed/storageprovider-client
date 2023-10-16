@@ -53,7 +53,7 @@ class StorageProviderClient:
         """
         headers = {}
         if system_token:
-            headers = {self.system_token_header: system_token}
+            headers = self.get_auth_header(system_token)
         res = requests.get(
             self.base_url + "/containers/" + container_key + "/" + object_key,
             headers=headers,
@@ -270,7 +270,7 @@ class StorageProviderClient:
         translations = translations or {}
         headers = {"Accept": "application/zip"}
         if system_token:
-            headers.update({self.system_token_header: system_token})
+            headers = self.get_auth_header(system_token)
         res = requests.get(
             self.base_url + "/containers/" + container_key,
             params=translations,
