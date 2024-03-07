@@ -1,3 +1,4 @@
+import io
 import os
 import unittest
 from unittest.mock import Mock
@@ -9,6 +10,7 @@ from storageprovider.client import StorageProviderClient
 test_collection_key = "test_collection"
 test_container_key = "test_container_key"
 test_object_key = "test_object_key"
+test_file_name = "test.pdf"
 test_base_url = "http://localhost:6543"
 test_check_url = test_base_url + "/collections/" + test_collection_key
 
@@ -606,3 +608,47 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
         self.assertEqual("test error, http status code: 400", str(error))
+
+    @patch("storageprovider.client.requests")
+    def test_get_object_from_archive_streaming(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_object_from_archive_streaming(
+            test_container_key, test_object_key, test_file_name
+        )
+        mock_requests.get.assert_called_with(
+            f"{test_check_url}/containers/{test_container_key}"
+            f"/{test_object_key}/{test_file_name}",
+            headers={},
+            stream=True,
+        )
+
+    @patch("storageprovider.client.requests")
+    def test_get_object_from_archive(self, mock_requests):
+        mock_requests.get.return_value.status_code = 200
+        self.storageproviderclient.get_object_from_archive(
+            test_container_key, test_object_key, test_file_name
+        )
+        mock_requests.get.assert_called_with(
+            f"{test_check_url}/containers/{test_container_key}"
+            f"/{test_object_key}/{test_file_name}",
+            headers={},
+        )
+
+    @patch("storageprovider.client.requests")
+    def test_replace_file_in_zip_object(self, mock_requests):
+        mock_requests.put.return_value.status_code = 200
+        new_file_name = "new_file.pdf"
+        new_file_content = io.BytesIO(b"test")
+        self.storageproviderclient.replace_file_in_zip_object(
+            test_container_key,
+            test_object_key,
+            test_file_name,
+            new_file_content,
+            new_file_name,
+        )
+        mock_requests.put.assert_called_with(
+            f"{test_check_url}/containers/{test_container_key}/{test_object_key}/{test_file_name}",
+            headers={},
+            data=new_file_content,
+            params={"new_file_name": "new_file.pdf"}
+        )
