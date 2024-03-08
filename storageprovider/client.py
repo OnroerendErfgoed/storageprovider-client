@@ -28,15 +28,17 @@ class StorageProviderClient:
         **requests_kwargs,
     ) -> Response:
         """
-        Send a request with the given data as json.
+        Send a request with the given params.
 
         This is a simple utility method to handle authorization headers,
-        basic accept and content-type headers.
+        basic accept, content-type headers and catch request exceptions.
 
         :param requests_method: a requests method to call. eg. requests.get, requests.post
         :param system_token: oauth system token
         :param url: url to post to.
-        :param requests_kwargs: extra kwargs which will be added to `requests.post`.
+        :param response_code: expected response code
+        :param headers: extra headers to add to the request
+        :param requests_kwargs: extra kwargs which will be added to the requests call.
         :return: The response
         """
         headers = headers or {}
@@ -64,7 +66,7 @@ class StorageProviderClient:
         response = self._execute_requests_method(
             requests.delete,
             system_token,
-            self.base_url + f"/containers/{container_key}/{object_key}",
+            f"{self.base_url}/containers/{container_key}/{object_key}",
         )
         return response
 
@@ -80,7 +82,7 @@ class StorageProviderClient:
         response = self._execute_requests_method(
             requests.get,
             system_token,
-            self.base_url + f"/containers/{container_key}/{object_key}",
+            f"{self.base_url}/containers/{container_key}/{object_key}",
             stream=True,
         )
 
@@ -99,7 +101,7 @@ class StorageProviderClient:
         response = self._execute_requests_method(
             requests.get,
             system_token,
-            self.base_url + f"/containers/{container_key}/{object_key}",
+            f"{self.base_url}/containers/{container_key}/{object_key}",
         )
         return response.content
 
@@ -116,7 +118,7 @@ class StorageProviderClient:
         response = self._execute_requests_method(
             requests.get,
             system_token,
-            self.base_url + f"/containers/{container_key}/{object_key}",
+            f"{self.base_url}/containers/{container_key}/{object_key}",
         )
         metadata = response.headers
         metadata["mime"] = metadata["Content-Type"]
@@ -198,15 +200,13 @@ class StorageProviderClient:
         :raises InvalidStateException: if the response is in an invalid state
         """
         headers = {"content-type": "application/json"}
-        if system_token:
-            headers.update(self.get_auth_header(system_token))
         object_data = {
             "host_url": self.host_url,
             "collection_key": self.collection,
             "container_key": source_container_key,
             "object_key": source_object_key,
         }
-        return self._execute_requests_method(
+        self._execute_requests_method(
             requests.put,
             system_token,
             f"{self.base_url}/containers/{output_container_key}/{output_object_key}",
@@ -266,13 +266,13 @@ class StorageProviderClient:
         :raises InvalidStateException: if the response is in an invalid state
         """
         headers = {"Accept": "application/json"}
-        resopnse = self._execute_requests_method(
+        response = self._execute_requests_method(
             requests.get,
             system_token,
             f"{self.base_url}/containers/{container_key}",
             headers=headers,
         )
-        return resopnse.content
+        return response.content
 
     def get_container_data_streaming(
         self, container_key, system_token=None, translations=None
@@ -344,7 +344,7 @@ class StorageProviderClient:
         response = self._execute_requests_method(
             requests.post,
             system_token,
-            self.base_url + "/containers",
+            f"{self.base_url}/containers",
             response_code=201,
         )
 
@@ -375,7 +375,7 @@ class StorageProviderClient:
         system_token=None
     ):
         """
-        retrieve an object from the data store as a stream
+        retrieve an object from an archive in the data store
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :param file_name: name of the file to get from the zip
@@ -399,7 +399,7 @@ class StorageProviderClient:
         system_token=None
     ):
         """
-        retrieve an object from the data store as a stream
+        retrieve an object from an archive in the data storeas a stream
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
