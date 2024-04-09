@@ -1,3 +1,8 @@
+2.8.0 (09/04/2024)
+==================
+
+- Add replace file in archive and fetch file from archive (#41)
+
 2.7.2 (16/11/2023)
 ==================
 
