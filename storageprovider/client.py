@@ -195,7 +195,8 @@ class StorageProviderClient:
         :param source_container_key: key of the source container in the data store
         :param source_object_key: key of the source object in the container
         :param output_container_key: key of output container in the data store
-        :param output_object_key: specific object key for the output object in the container
+        :param output_object_key: specific object key for the output
+        object in the container
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
@@ -368,11 +369,7 @@ class StorageProviderClient:
         )
 
     def get_object_from_archive(
-        self,
-        container_key,
-        object_key,
-        file_name,
-        system_token=None
+        self, container_key, object_key, file_name, system_token=None
     ):
         """
         retrieve an object from an archive in the data store
@@ -392,11 +389,7 @@ class StorageProviderClient:
         return response.content
 
     def get_object_from_archive_streaming(
-        self,
-        container_key,
-        object_key,
-        file_name,
-        system_token=None
+        self, container_key, object_key, file_name, system_token=None
     ):
         """
         retrieve an object from an archive in the data storeas a stream
