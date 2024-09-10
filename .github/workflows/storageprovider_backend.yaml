@@ -5,7 +5,7 @@ on:
     paths:
       - storageprovider/**
       - tests/**
-      - .github/workflows/storageprovider.yaml
+      - .github/workflows/**
       - pyproject.toml
       - requirements*.txt
 
