@@ -61,7 +61,3 @@ main = "storageprovider:main"
 only-include = [
     "/storageprovider",
 ]
-
-[tool.hatch.metadata]
-# This allows us to use github links as dependencies
-allow-direct-references = true
