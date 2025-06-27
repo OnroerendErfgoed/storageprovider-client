@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from storageprovider.client import InvalidStateException
 from storageprovider.client import StorageProviderClient
+from storageprovider.providers import AugeiasProvider
 
 test_collection_key = "test_collection"
 test_container_key = "test_container_key"
@@ -27,9 +28,8 @@ class AnyObject:
 
 class StorageProviderTest(unittest.TestCase):
     def setUp(self):
-        self.storageproviderclient = StorageProviderClient(
-            test_base_url, test_collection_key
-        )
+        provider = AugeiasProvider(test_base_url, test_collection_key)
+        self.storageproviderclient = StorageProviderClient(provider)
 
     def tearDown(self):
         pass
@@ -650,5 +650,5 @@ class StorageProviderTest(unittest.TestCase):
             f"{test_check_url}/containers/{test_container_key}/{test_object_key}/{test_file_name}",
             headers={},
             data=new_file_content,
-            params={"new_file_name": "new_file.pdf"}
+            params={"new_file_name": "new_file.pdf"},
         )
