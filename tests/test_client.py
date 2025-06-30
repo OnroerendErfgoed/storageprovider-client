@@ -647,7 +647,8 @@ class StorageProviderTest(unittest.TestCase):
             new_file_name,
         )
         mock_requests.put.assert_called_with(
-            f"{test_check_url}/containers/{test_container_key}/{test_object_key}/{test_file_name}",
+            f"{test_check_url}/containers/{test_container_key}"
+            f"/{test_object_key}/{test_file_name}",
             headers={},
             data=new_file_content,
             params={"new_file_name": "new_file.pdf"},
