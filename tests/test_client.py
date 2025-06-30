@@ -5,8 +5,8 @@ from unittest.mock import Mock
 from unittest.mock import patch
 
 from storageprovider.client import StorageProviderClient
-from storageprovider.providers.AugeiasProvider import AugeiasProvider
-from storageprovider.providers.AugeiasProvider import InvalidStateException
+from storageprovider.providers.augeias import AugeiasProvider
+from storageprovider.providers.augeias import InvalidStateException
 
 test_collection_key = "test_collection"
 test_container_key = "test_container_key"
@@ -34,7 +34,7 @@ class StorageProviderTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_object(self, mock_requests):
         mock_requests.delete.return_value.status_code = 200
         self.storageproviderclient.delete_object(test_container_key, test_object_key)
@@ -47,7 +47,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_object_system_token(self, mock_requests):
         mock_requests.delete.return_value.status_code = 200
         self.storageproviderclient.delete_object(
@@ -62,7 +62,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_object_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -77,7 +77,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_streaming(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object_streaming(
@@ -93,7 +93,7 @@ class StorageProviderTest(unittest.TestCase):
             stream=True,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object(test_container_key, test_object_key)
@@ -106,7 +106,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object(
@@ -121,10 +121,11 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_custom_system_token(self, mock_requests):
+        provider = AugeiasProvider(test_base_url, test_collection_key)
         storageproviderclient = StorageProviderClient(
-            test_base_url, test_collection_key
+            provider
         )
         mock_requests.get.return_value.status_code = 200
         storageproviderclient.get_object(
@@ -139,7 +140,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -152,7 +153,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_and_metadata(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         object_dict = self.storageproviderclient.get_object_and_metadata(
@@ -169,7 +170,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertIn("object", object_dict)
         self.assertIn("metadata", object_dict)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_metadata(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         mock_requests.get.return_value.json.return_value = {
@@ -195,7 +196,7 @@ class StorageProviderTest(unittest.TestCase):
             result,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_metadata_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         mock_requests.get.return_value.json.return_value = {
@@ -221,7 +222,7 @@ class StorageProviderTest(unittest.TestCase):
             result,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_metadata_KO(self, mock_requests):
         mock_requests.head.return_value.status_code = 400
         self.assertRaises(
@@ -231,7 +232,7 @@ class StorageProviderTest(unittest.TestCase):
             test_object_key,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_update_object(self, mock_requests):
         kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
         mock_requests.put.return_value.status_code = 200
@@ -251,7 +252,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"content-type": "application/octet-stream"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_update_object_system_token(self, mock_requests):
         kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
         mock_requests.put.return_value.status_code = 200
@@ -272,7 +273,7 @@ class StorageProviderTest(unittest.TestCase):
             },
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_update_object_KO(self, mock_requests):
         kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
         error_thrown = False
@@ -289,7 +290,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_object_and_key_system_token(self, mock_requests):
         kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
         mock_requests.post.return_value.status_code = 201
@@ -310,7 +311,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         self.assertEqual("jk455", res)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_object_and_key_KO(self, mock_requests):
         kasteel = os.path.join(here, "..", "fixtures/kasteel.jpg")
         mock_requests.post.return_value.status_code = 400
@@ -326,7 +327,7 @@ class StorageProviderTest(unittest.TestCase):
                 "x123-test",
             )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_copy_object_create_key_system_token(self, mock_requests):
         mock_requests.post.return_value.status_code = 201
         mock_requests.post.return_value.json = Mock(
@@ -350,7 +351,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         self.assertEqual("jk455", res)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_copy_object_create_key_KO(self, mock_requests):
         mock_requests.post.return_value.status_code = 400
         mock_requests.post.return_value.json = Mock(
@@ -365,7 +366,7 @@ class StorageProviderTest(unittest.TestCase):
             "x123-test",
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_copy_object_system_token(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
         self.storageproviderclient.copy_object(
@@ -393,7 +394,7 @@ class StorageProviderTest(unittest.TestCase):
             },
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_copy_object_KO(self, mock_requests):
         mock_requests.put.return_value.status_code = 400
         self.assertRaises(
@@ -406,7 +407,7 @@ class StorageProviderTest(unittest.TestCase):
             "x123-test",
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_list_object_keys_for_container(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.list_object_keys_for_container(test_container_key)
@@ -415,7 +416,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Accept": "application/json"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_list_object_keys_for_container_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.list_object_keys_for_container(
@@ -426,7 +427,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Accept": "application/json", "Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_list_object_keys_for_container_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -441,7 +442,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_container_data_streaming(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_container_data_streaming(test_container_key)
@@ -452,7 +453,7 @@ class StorageProviderTest(unittest.TestCase):
             stream=True,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_container_data(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_container_data(test_container_key)
@@ -462,7 +463,7 @@ class StorageProviderTest(unittest.TestCase):
             params={},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_container_data_translations(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_container_data(
@@ -474,7 +475,7 @@ class StorageProviderTest(unittest.TestCase):
             params={"001": "filename.pdf"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_container_system_token(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_container_data(test_container_key, "x123-test")
@@ -484,7 +485,7 @@ class StorageProviderTest(unittest.TestCase):
             params={},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_container_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -497,7 +498,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
         self.storageproviderclient.create_container(test_container_key)
@@ -505,7 +506,7 @@ class StorageProviderTest(unittest.TestCase):
             test_check_url + "/containers/" + test_container_key, headers={}
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_system_token(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
         self.storageproviderclient.create_container(test_container_key, "x123-test")
@@ -514,7 +515,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -527,7 +528,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_and_key(self, mock_requests):
         mock_requests.post.return_value.status_code = 201
         mock_requests.post.return_value.json = Mock(
@@ -539,7 +540,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         self.assertEqual("jk455", res)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_and_key_system_token(self, mock_requests):
         mock_requests.post.return_value.status_code = 201
         mock_requests.post.return_value.json = Mock(
@@ -552,7 +553,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         self.assertEqual("jk455", res)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_and_key_no_unicode(self, mock_requests):
         mock_requests.post.return_value.status_code = 201
         mock_requests.post.return_value.json = Mock(
@@ -564,7 +565,7 @@ class StorageProviderTest(unittest.TestCase):
         )
         self.assertEqual("jk455", res)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_create_container_and_key_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -577,7 +578,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertTrue(error_thrown)
         self.assertEqual(400, error.status_code)
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_container(self, mock_requests):
         mock_requests.delete.return_value.status_code = 200
         self.storageproviderclient.delete_container(test_container_key)
@@ -585,7 +586,7 @@ class StorageProviderTest(unittest.TestCase):
             test_check_url + "/containers/" + test_container_key, headers={}
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_container_system_token(self, mock_requests):
         mock_requests.delete.return_value.status_code = 200
         self.storageproviderclient.delete_container(test_container_key, "x123-test")
@@ -594,7 +595,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={"Authorization": "Bearer x123-test"},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_delete_container_KO(self, mock_requests):
         error_thrown = False
         error = None
@@ -609,7 +610,7 @@ class StorageProviderTest(unittest.TestCase):
         self.assertEqual(400, error.status_code)
         self.assertEqual("test error, http status code: 400", str(error))
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_from_archive_streaming(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object_from_archive_streaming(
@@ -622,7 +623,7 @@ class StorageProviderTest(unittest.TestCase):
             stream=True,
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_get_object_from_archive(self, mock_requests):
         mock_requests.get.return_value.status_code = 200
         self.storageproviderclient.get_object_from_archive(
@@ -634,7 +635,7 @@ class StorageProviderTest(unittest.TestCase):
             headers={},
         )
 
-    @patch("storageprovider.client.requests")
+    @patch("storageprovider.providers.augeias.requests")
     def test_replace_file_in_zip_object(self, mock_requests):
         mock_requests.put.return_value.status_code = 200
         new_file_name = "new_file.pdf"
