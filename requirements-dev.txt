@@ -42,6 +42,8 @@ markupsafe==2.1.5
     #   mako
 mccabe==0.7.0
     # via flake8
+minio==7.2.15
+    # via storageprovider-client (pyproject.toml)
 mock==5.1.0
     # via storageprovider-client (pyproject.toml)
 packaging==24.2
