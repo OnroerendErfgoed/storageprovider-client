@@ -1,4 +1,10 @@
+import concurrent
+import io
 import re
+import uuid
+import zipfile
+
+from minio.commonconfig import CopySource
 
 from storageprovider.providers import BaseStorageProvider
 
@@ -12,7 +18,7 @@ class MinioProvider(BaseStorageProvider):
             server_url, access_key=access_key, secret_key=secret_key, secure=False
         )
 
-    def _clean_identifier(identifier: str) -> str:
+    def _clean_identifier(self, identifier: str) -> str:
         """
         https://datatracker.ietf.org/doc/html/draft-kunze-pairtree-01#section-3
         """
@@ -31,11 +37,11 @@ class MinioProvider(BaseStorageProvider):
         converted = [chars_conversion.get(char, char) for char in cleaned]
         return "".join(converted)
 
-    def _id_to_pairtree_path(identifier: str) -> str:
+    def _id_to_pairtree_path(self, identifier: str) -> str:
         """
         Converts a cleaned identifier to a PairTree path using 2-character segments.
         """
-        cleaned = clean_identifier(identifier)
+        cleaned = self.clean_identifier(identifier)
         segments = [cleaned[i : i + 2] for i in range(0, len(cleaned), 2)]
         return "/".join(segments) + "/"
 
@@ -48,7 +54,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
-        client.remove_object(
+        self.client.remove_object(
             self.bucket_name, f"{self._id_to_pairtree_path(container_key)}{object_key}"
         )
 
@@ -62,7 +68,7 @@ class MinioProvider(BaseStorageProvider):
         :raises InvalidStateException: if the response is in an invalid state
         """
         try:
-            response = client.get_object(
+            response = self.client.get_object(
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
@@ -82,7 +88,7 @@ class MinioProvider(BaseStorageProvider):
         :raises InvalidStateException: if the response is in an invalid state
         """
         try:
-            response = client.get_object(
+            response = self.client.get_object(
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
@@ -102,14 +108,16 @@ class MinioProvider(BaseStorageProvider):
         :raises InvalidStateException: if the response is in an invalid state
         """
         try:
-            response = client.get_object(
+            response = self.client.get_object(
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
-            result = client.stat_object(
+            result = self.client.stat_object(
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
+            metadata = {}
+            metadata["time_last_modification"] = result.last_modified
             metadata["mime"] = result.content_type
             metadata["size"] = result.size
             return {"object": response.read(), "metadata": metadata}
@@ -127,9 +135,11 @@ class MinioProvider(BaseStorageProvider):
         :return headers of the object
         :raises InvalidStateException: if the response is in an invalid state
         """
-        result = client.stat_object(
+        result = self.client.stat_object(
             self.bucket_name, f"{self._id_to_pairtree_path(container_key)}{object_key}"
         )
+        metadata = {}
+        metadata["time_last_modification"] = result.last_modified
         metadata["mime"] = result.content_type
         metadata["size"] = result.size
         return metadata
@@ -151,7 +161,7 @@ class MinioProvider(BaseStorageProvider):
         :raises InvalidStateException: if the response is in an invalid state
         """
         output_object_key = str(uuid.uuid4())
-        client.copy_object(
+        self.client.copy_object(
             self.bucket_name,
             f"{self._id_to_pairtree_path(output_container_key)}{output_object_key}",
             CopySource(
@@ -179,7 +189,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
-        client.copy_object(
+        self.client.copy_object(
             self.bucket_name,
             f"{self._id_to_pairtree_path(output_container_key)}{output_object_key}",
             CopySource(
@@ -198,7 +208,7 @@ class MinioProvider(BaseStorageProvider):
          :raises InvalidStateException: if the response is in an invalid state
         """
         object_key = str(uuid.uuid4())
-        client.put_object(
+        self.client.put_object(
             self.bucket_name,
             f"{self._id_to_pairtree_path(container_key)}{object_key}",
             object_data,
@@ -215,7 +225,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
-        client.put_object(
+        self.client.put_object(
             self.bucket_name,
             f"{self._id_to_pairtree_path(container_key)}{object_key}",
             object_data,
@@ -230,7 +240,7 @@ class MinioProvider(BaseStorageProvider):
         :return list of object keys found in the container
         :raises InvalidStateException: if the response is in an invalid state
         """
-        objects = client.list_objects(
+        objects = self.client.list_objects(
             self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}"
         )
         return objects
@@ -268,7 +278,7 @@ class MinioProvider(BaseStorageProvider):
             :param object_key: Key of the object to fetch
             :return: Tuple of object key and content
             """
-            response = client.get_object(bucket_name, object_key)
+            response = self.client.get_object(self.bucket_name, object_key)
             try:
                 return object_key, response.read()
             finally:
@@ -276,7 +286,7 @@ class MinioProvider(BaseStorageProvider):
                 response.release_conn()
 
         # List all objects under the container key
-        objects = client.list_objects(bucket_name, prefix=f"{container_key}")
+        objects = self.client.list_objects(self.bucket_name, prefix=f"{container_key}")
 
         # Fetch all objects concurrently
         object_contents = []
@@ -333,7 +343,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
-        client.remove_object(
+        self.client.remove_object(
             self.bucket_name, f"{self._id_to_pairtree_path(container_key)}"
         )
 
