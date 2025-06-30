@@ -41,7 +41,7 @@ class MinioProvider(BaseStorageProvider):
         """
         Converts a cleaned identifier to a PairTree path using 2-character segments.
         """
-        cleaned = self.clean_identifier(identifier)
+        cleaned = self._clean_identifier(identifier)
         segments = [cleaned[i : i + 2] for i in range(0, len(cleaned), 2)]
         return "/".join(segments) + "/"
 
@@ -72,7 +72,8 @@ class MinioProvider(BaseStorageProvider):
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
-            return response.stream(1024 * 1024)
+            for chunk in response.stream(1024 * 1024):
+                yield chunk
         finally:
             response.close()
             response.release_conn()
@@ -286,8 +287,7 @@ class MinioProvider(BaseStorageProvider):
                 response.release_conn()
 
         # List all objects under the container key
-        objects = self.client.list_objects(self.bucket_name, prefix=f"{container_key}")
-
+        objects = self.client.list_objects(self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}")
         # Fetch all objects concurrently
         object_contents = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -309,7 +309,7 @@ class MinioProvider(BaseStorageProvider):
                 zip_file.writestr(translations.get(object_key, object_key), content)
 
         zip_buffer.seek(0)
-        return zip_buffer
+        return zip_buffer.read()
 
     def create_container(self, container_key, system_token=None):
         """
