@@ -1,4 +1,13 @@
+import logging
+from typing import Callable
+
 from storageprovider.providers import BaseStorageProvider
+
+import requests
+from requests import RequestException
+from requests import Response
+
+LOG = logging.getLogger(__name__)
 
 
 class AugeiasProvider(BaseStorageProvider):
