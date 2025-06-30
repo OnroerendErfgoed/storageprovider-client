@@ -1,4 +1,4 @@
-from providers import BaseStorageProvider
+from storageprovider.providers import BaseStorageProvider
 
 
 class StorageProviderClient:
