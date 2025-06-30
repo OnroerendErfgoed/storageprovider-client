@@ -4,9 +4,9 @@ import unittest
 from unittest.mock import Mock
 from unittest.mock import patch
 
-from storageprovider.client import InvalidStateException
 from storageprovider.client import StorageProviderClient
-from storageprovider.providers import AugeiasProvider
+from storageprovider.providers.AugeiasProvider import AugeiasProvider
+from storageprovider.providers.AugeiasProvider import InvalidStateException
 
 test_collection_key = "test_collection"
 test_container_key = "test_container_key"
