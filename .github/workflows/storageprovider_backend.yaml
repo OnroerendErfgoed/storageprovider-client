@@ -1,7 +1,7 @@
 name: storagepvorider-client backend tests
 
 on:
-  push:
+  pull_request:
     paths:
       - storagepvorider/**
       - tests/**
