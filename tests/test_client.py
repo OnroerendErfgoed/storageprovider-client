@@ -115,3 +115,41 @@ def test_replaces_file_in_zip_object(storage_provider_client):
         test_new_file_name,
         None,
     )
+
+def test_retrieves_object_and_metadata(storage_provider_client):
+    storage_provider_client.get_object_and_metadata(test_container_key, test_object_key)
+    storage_provider_client.provider.get_object_and_metadata.assert_called_once_with(
+        test_container_key, test_object_key, None
+    )
+
+def test_copies_object(storage_provider_client):
+    storage_provider_client.copy_object(
+        test_container_key, test_object_key, test_container_key, test_object_key
+    )
+    storage_provider_client.provider.copy_object.assert_called_once_with(
+        test_container_key, test_object_key, test_container_key, test_object_key, None
+    )
+
+def test_retrieves_container_data(storage_provider_client):
+    storage_provider_client.get_container_data(test_container_key)
+    storage_provider_client.provider.get_container_data.assert_called_once_with(
+        test_container_key, None, None
+    )
+
+def test_retrieves_container_data_streaming(storage_provider_client):
+    storage_provider_client.get_container_data_streaming(test_container_key)
+    storage_provider_client.provider.get_container_data_streaming.assert_called_once_with(
+        test_container_key, None, None
+    )
+
+def test_creates_container_and_key(storage_provider_client):
+    storage_provider_client.create_container_and_key()
+    storage_provider_client.provider.create_container_and_key.assert_called_once_with(None)
+
+def test_retrieves_object_from_archive_streaming(storage_provider_client):
+    storage_provider_client.get_object_from_archive_streaming(
+        test_container_key, test_object_key, test_file_name
+    )
+    storage_provider_client.provider.get_object_from_archive_streaming.assert_called_once_with(
+        test_container_key, test_object_key, test_file_name, None
+    )
