@@ -35,7 +35,7 @@ jobs:
           python -m venv ${{ env.PYTHON_VENV }}
           source ${{ env.PYTHON_VENV }}/bin/activate
           pip install --upgrade pip
-          pip install -r requirements-ci.txt
+          pip install -r requirements-dev.txt
           pip install -e ../
 
       - name: Python tests
