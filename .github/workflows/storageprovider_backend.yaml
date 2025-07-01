@@ -31,10 +31,21 @@ jobs:
           HATCH_BUILD_NO_HOOKS: true
         working-directory: ./
         run: |
-          pip --version
-          pip install pip-tools
-          pip-sync requirements-dev.txt
-          pip install -e .
+          python -m venv ${{ env.PYTHON_VENV }}
+          source ${{ env.PYTHON_VENV }}/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements-ci.txt
+          pip install -e ../
 
       - name: Python tests
-        run: pytest tests --exitfirst --capture=no -vvv --full-trace
+        run: pytest --cov-report xml:${{ runner.temp }}/coverage.xml --cov=storagepvorider tests
+
+      - name: Get Cover
+        uses: orgoro/coverage@v3.2
+        with:
+          coverageFile: ${{ runner.temp }}/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sourceDir: storagepvorider
+          thresholdAll: 0.5
+          thresholdNew: 0.9
+          thresholdModified: 0.8
