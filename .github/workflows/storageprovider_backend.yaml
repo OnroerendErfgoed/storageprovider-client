@@ -43,14 +43,14 @@ jobs:
           PYTHON_VENV: 'storageprovider_client_venv'
         run: |
           source ${{ env.PYTHON_VENV }}/bin/activate
-          pytest --cov-report xml:${{ runner.temp }}/coverage.xml --cov=storagepvorider tests
+          pytest --cov-report xml:${{ runner.temp }}/coverage.xml --cov=storageprovider tests
 
       - name: Get Cover
         uses: orgoro/coverage@v3.2
         with:
           coverageFile: ${{ runner.temp }}/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
-          sourceDir: storagepvorider
+          sourceDir: storageprovider
           thresholdAll: 0.5
           thresholdNew: 0.9
           thresholdModified: 0.8
