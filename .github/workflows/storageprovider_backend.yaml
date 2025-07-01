@@ -29,6 +29,7 @@ jobs:
       - name: Install python requirements
         env:
           HATCH_BUILD_NO_HOOKS: true
+          PYTHON_VENV: 'storageprovider_client_venv'
         working-directory: ./
         run: |
           python -m venv ${{ env.PYTHON_VENV }}
