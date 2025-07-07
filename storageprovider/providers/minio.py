@@ -71,8 +71,7 @@ class MinioProvider(BaseStorageProvider):
                 self.bucket_name,
                 f"{self._id_to_pairtree_path(container_key)}{object_key}",
             )
-            for chunk in response.stream(1024 * 1024):
-                yield chunk
+            yield from response.stream(1024 * 1024)
         finally:
             response.close()
             response.release_conn()
