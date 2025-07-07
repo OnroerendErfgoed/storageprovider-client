@@ -343,9 +343,11 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :raises InvalidStateException: if the response is in an invalid state
         """
-        self.client.remove_object(
-            self.bucket_name, f"{self._id_to_pairtree_path(container_key)}"
+        objects_to_delete = self.client.list_objects(
+            self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}", recursive=True
         )
+        for obj in objects_to_delete:
+            self.client.remove_object(self.bucket_name, obj.object_name)
 
     def get_object_from_archive(
         self, container_key, object_key, file_name, system_token=None
