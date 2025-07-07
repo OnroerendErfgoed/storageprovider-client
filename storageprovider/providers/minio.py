@@ -1,6 +1,5 @@
 import concurrent
 import io
-import re
 import uuid
 import zipfile
 
@@ -52,7 +51,7 @@ class MinioProvider(BaseStorageProvider):
         :param container_key: key of the container in the data store
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         self.client.remove_object(
             self.bucket_name, f"{self._id_to_pairtree_path(container_key)}{object_key}"
@@ -65,7 +64,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
         :return content of the object as a stream
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         try:
             response = self.client.get_object(
@@ -86,7 +85,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
         :return content of the object
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         try:
             response = self.client.get_object(
@@ -106,7 +105,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
         :return content of the object
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         try:
             response = self.client.get_object(
@@ -134,7 +133,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
         :return headers of the object
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         result = self.client.stat_object(
             self.bucket_name, f"{self._id_to_pairtree_path(container_key)}{object_key}"
@@ -159,7 +158,7 @@ class MinioProvider(BaseStorageProvider):
         :param source_object_key: key of the source object in the container
         :param output_container_key: key of output container in the data store
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         output_object_key = str(uuid.uuid4())
         self.client.copy_object(
@@ -188,7 +187,7 @@ class MinioProvider(BaseStorageProvider):
         :param output_container_key: key of output container in the data store
         :param output_object_key: specific object key for the output object in the container
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         self.client.copy_object(
             self.bucket_name,
@@ -206,7 +205,7 @@ class MinioProvider(BaseStorageProvider):
          :param container_key: key of the container in the data store
          :param object_data: data of the object
          :param system_token: oauth system token
-         :raises InvalidStateException: if the response is in an invalid state
+         :raises MinioException: if an error executing the request occured
         """
         object_key = str(uuid.uuid4())
         self.client.put_object(
@@ -224,7 +223,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param object_data: data of the object
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         self.client.put_object(
             self.bucket_name,
@@ -239,7 +238,7 @@ class MinioProvider(BaseStorageProvider):
         :param container_key: key of the container in the data store
         :param system_token: oauth system token
         :return list of object keys found in the container
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         objects = self.client.list_objects(
             self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}"
@@ -255,7 +254,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :param translations: Dict of object IDs and file names to use for them.
         :return zip of objects as a stream
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         raise NotImplementedError(
             "get_container_data_streaming is not implemented for MinioProvider"
@@ -269,7 +268,7 @@ class MinioProvider(BaseStorageProvider):
         :param system_token: oauth system token
         :param translations: Dict of object IDs and file names to use for them.
         :return list of object keys found in the container
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         translations = translations or {}
 
@@ -317,7 +316,7 @@ class MinioProvider(BaseStorageProvider):
 
         :param container_key: key of the container in the data store
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         raise NotImplementedError(
             "create_container is not implemented for MinioProvider"
@@ -329,7 +328,7 @@ class MinioProvider(BaseStorageProvider):
 
         :param system_token: oauth system token
         :return the key generated for the container
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         raise NotImplementedError(
             "create_container_and_key is not implemented for MinioProvider"
@@ -341,7 +340,7 @@ class MinioProvider(BaseStorageProvider):
 
         :param container_key: key of the container in the data store
         :param system_token: oauth system token
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         objects_to_delete = self.client.list_objects(
             self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}", recursive=True
@@ -359,7 +358,7 @@ class MinioProvider(BaseStorageProvider):
         :param file_name: name of the file to get from the zip
         :param system_token: oauth system token
         :return content of the object as a stream
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         raise NotImplementedError(
             "get_object_from_archive is not implemented for MinioProvider"
@@ -374,7 +373,7 @@ class MinioProvider(BaseStorageProvider):
         :param object_key: specific object key for the object in the container
         :param system_token: oauth system token
         :return content of the object as a stream
-        :raises InvalidStateException: if the response is in an invalid state
+        :raises MinioException: if an error executing the request occured
         """
         raise NotImplementedError(
             "get_object_from_archive_streaming is not implemented for MinioProvider"
