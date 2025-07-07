@@ -213,7 +213,7 @@ def test_create_container_and_key_not_implemented(minio_provider):
 def test_delete_container(minio_provider):
     container_key = "container"
     minio_provider.delete_container(container_key)
-    minio_provider.client.remove_object.assert_called_once()
+    minio_provider.client.list_objects.assert_called_once()
 
 
 def test_get_object_from_archive_not_implemented(minio_provider):
