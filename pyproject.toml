@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-version = "3.0.0a1"
+version = "3.0.0a2"
 name = "storageprovider-client"
 dynamic = ["readme"]
 authors = [
