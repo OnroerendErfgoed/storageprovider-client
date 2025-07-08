@@ -119,6 +119,8 @@ class MinioProvider(BaseStorageProvider):
             metadata["time_last_modification"] = result.last_modified
             metadata["mime"] = result.content_type
             metadata["size"] = result.size
+            metadata["content-type"] = result.content_type
+            metadata["content-length"] = result.size
             return {"object": response.read(), "metadata": metadata}
         finally:
             response.close()
@@ -141,6 +143,8 @@ class MinioProvider(BaseStorageProvider):
         metadata["time_last_modification"] = result.last_modified
         metadata["mime"] = result.content_type
         metadata["size"] = result.size
+        metadata["content-type"] = result.content_type
+        metadata["content-length"] = result.size
         return metadata
 
     def copy_object_and_create_key(
@@ -211,6 +215,8 @@ class MinioProvider(BaseStorageProvider):
             self.bucket_name,
             f"{self._id_to_pairtree_path(container_key)}{object_key}",
             object_data,
+            length=-1,
+            part_size=10 * 1024 * 1024,
         )
         return object_key
 
@@ -228,6 +234,8 @@ class MinioProvider(BaseStorageProvider):
             self.bucket_name,
             f"{self._id_to_pairtree_path(container_key)}{object_key}",
             object_data,
+            length=-1,
+            part_size=10 * 1024 * 1024,
         )
 
     def list_object_keys_for_container(self, container_key, system_token=None):
@@ -285,7 +293,9 @@ class MinioProvider(BaseStorageProvider):
                 response.release_conn()
 
         # List all objects under the container key
-        objects = self.client.list_objects(self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}")
+        objects = self.client.list_objects(
+            self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}"
+        )
         # Fetch all objects concurrently
         object_contents = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -342,7 +352,9 @@ class MinioProvider(BaseStorageProvider):
         :raises MinioException: if an error executing the request occured
         """
         objects_to_delete = self.client.list_objects(
-            self.bucket_name, prefix=f"{self._id_to_pairtree_path(container_key)}", recursive=True
+            self.bucket_name,
+            prefix=f"{self._id_to_pairtree_path(container_key)}",
+            recursive=True,
         )
         for obj in objects_to_delete:
             self.client.remove_object(self.bucket_name, obj.object_name)

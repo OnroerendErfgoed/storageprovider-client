@@ -92,6 +92,8 @@ def test_get_object_and_metadata(minio_provider):
             "time_last_modification": "2023-01-01T00:00:00Z",
             "mime": "application/json",
             "size": 1234,
+            "content-type": "application/json",
+            "content-length": 1234,
         },
     }
     minio_provider.client.get_object.assert_called_once_with(
@@ -119,6 +121,8 @@ def test_get_object_metadata(minio_provider):
         "time_last_modification": "2023-01-01T00:00:00Z",
         "mime": "application/json",
         "size": 1234,
+        "content-type": "application/json",
+        "content-length": 1234,
     }
     minio_provider.client.stat_object.assert_called_once_with(
         minio_provider.bucket_name, "co/nt/ai/ne/r/object"
