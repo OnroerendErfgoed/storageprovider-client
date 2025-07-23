@@ -92,7 +92,7 @@ requests==2.32.3
     #   storageprovider-client (pyproject.toml)
     #   coveralls
     #   sphinx
-setuptools==70.2.0
+setuptools==78.1.1
     # via
     #   pyramid
     #   zope-deprecation
