@@ -24,7 +24,7 @@ classifiers = [
 ]
 dependencies = [
     "minio==7.2.15",
-    "requests==2.32.3"
+    "requests==2.32.4"
 ]
 
 [project.urls]
