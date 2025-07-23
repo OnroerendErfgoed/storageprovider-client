@@ -133,7 +133,7 @@ translationstring==1.4
     # via pyramid
 trove-classifiers==2024.7.2
     # via hatchling
-urllib3==2.2.2
+urllib3==2.5.0
     # via requests
 uv==0.5.13
     # via storageprovider-client (pyproject.toml)
