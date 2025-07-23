@@ -1,3 +1,8 @@
+3.0.0 (23/07/2025)
+==================
+
+- Ondersteuning bieden voor verschillende providers (#48)
+
 2.8.0 (09/04/2024)
 ==================
 
