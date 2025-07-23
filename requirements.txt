@@ -8,5 +8,5 @@ minio==7.2.15
     # via storageprovider-client (pyproject.toml)
 requests==2.32.3
     # via storageprovider-client (pyproject.toml)
-urllib3==2.2.2
+urllib3==2.5.0
     # via requests
