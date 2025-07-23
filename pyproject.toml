@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+version = "3.0.0"
+name = "storageprovider-client"
+dynamic = ["readme"]
+authors = [
+    { name = "Flanders Heritage Agency", email = "ict@onroerenderfgoed.be" },
+]
+description = "storageprovider client"
+requires-python = ">=3.10,<3.13"
+keywords = ["web", "wsgi", "pyramid", "SKOS", "thesaurus", "vocabulary"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "Framework :: Pyramid",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "minio==7.2.15",
+    "requests==2.32.3"
+]
+
+[project.urls]
+History = "https://github.com/OnroerendErfgoed/storageprovider-client/blob/master/CHANGES.txt"
+Tracker = "https://github.com/OnroerendErfgoed/storageprovider-client/issues"
+Source = "https://github.com/OnroerendErfgoed/storageprovider-client"
+Documentation = "https://storageprovider-client.readthedocs.io/en/latest/"
+
+[project.optional-dependencies]
+dev = [
+    "coveralls==4.0.1",
+    "flake8==7.1.1",
+    "hatchling==1.27.0",
+    "mock==5.1.0",
+    "pyramid-debugtoolbar==4.12.1",
+    "pytest-cov==6.0.0",
+    "pytest==8.3.4",
+    "sphinx==8.1.3",
+    "sphinx_rtd_theme==3.0.2",
+    "sphinxcontrib-httpdomain==1.8.1",
+    "tempdir==0.7.1",
+    "uv==0.5.13",
+    "waitress==3.0.2",
+    "webtest==3.0.2",
+]
+
+[project.entry-points."paste.app_factory"]
+main = "storageprovider:main"
+
+##
+# Build tool specific
+##
+[tool.hatch.build.targets.wheel]
+# In the wheel we want to have storageprovider in the root as python module.
+only-include = [
+    "/storageprovider",
+]
