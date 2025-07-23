@@ -4,6 +4,8 @@ charset-normalizer==3.3.2
     # via requests
 idna==3.7
     # via requests
+minio==7.2.15
+    # via storageprovider-client (pyproject.toml)
 requests==2.32.3
     # via storageprovider-client (pyproject.toml)
 urllib3==2.2.2
