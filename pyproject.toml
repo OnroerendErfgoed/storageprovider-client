@@ -46,7 +46,7 @@ dev = [
     "sphinx_rtd_theme==3.0.2",
     "sphinxcontrib-httpdomain==1.8.1",
     "tempdir==0.7.1",
-    "uv==0.5.13",
+    "uv==0.8.6",
     "waitress==3.0.2",
     "webtest==3.0.2",
 ]
