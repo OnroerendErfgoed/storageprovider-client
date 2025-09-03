@@ -300,7 +300,7 @@ class MinioProvider(BaseStorageProvider):
         object_contents = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_object = {
-                executor.submit(fetch_object, obj.object_key): obj.object_key
+                executor.submit(fetch_object, obj.object_name): obj.object_name
                 for obj in objects
             }
             for future in concurrent.futures.as_completed(future_to_object):

@@ -191,7 +191,7 @@ def test_get_container_data_streaming_not_implemented(minio_provider):
 def test_get_container_data(minio_provider):
     container_key = "container"
     mock_object = MagicMock()
-    mock_object.object_key = "co/nt/ai/ne/r/object"
+    mock_object.object_name = "co/nt/ai/ne/r/object"
     minio_provider.client.list_objects.return_value = [mock_object]
     mock_response = MagicMock()
     mock_response.read.return_value = b"data"
