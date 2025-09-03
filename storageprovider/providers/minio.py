@@ -300,7 +300,7 @@ class MinioProvider(BaseStorageProvider):
         object_contents = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future_to_object = {
-                executor.submit(fetch_object, obj.object_name): obj.object_name
+                executor.submit(fetch_object, obj.object_key): obj.object_key
                 for obj in objects
             }
             for future in concurrent.futures.as_completed(future_to_object):
@@ -314,7 +314,8 @@ class MinioProvider(BaseStorageProvider):
         zip_buffer = io.BytesIO()
         with zipfile.ZipFile(zip_buffer, "w") as zip_file:
             for object_key, content in object_contents:
-                zip_file.writestr(translations.get(object_key, object_key), content)
+                normalized_object_key = object_key.rsplit("/", 1)[-1]
+                zip_file.writestr(translations.get(normalized_object_key, normalized_object_key), content)
 
         zip_buffer.seek(0)
         return zip_buffer.read()
